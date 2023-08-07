@@ -10,7 +10,11 @@ class TweetsController < ApplicationController
     user = session.user
     @tweet = user.tweets.new(tweet_params)
 
-    render 'tweets/create' if @tweet.save
+    if @tweet.save
+      TweetMailer.notify(@tweet).deliver!
+      render 'tweets/create'
+    end
+  
   end
 
   def destroy
@@ -45,6 +49,7 @@ class TweetsController < ApplicationController
   private
 
   def tweet_params
-    params.require(:tweet).permit(:message)
+    params.require(:tweet).permit(:message, :image)
+
   end
 end
